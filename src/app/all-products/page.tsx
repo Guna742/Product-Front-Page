@@ -90,6 +90,18 @@ export default function AllProducts() {
     }
   };
 
+  // Category specific premium gradient background for each icon
+  const iconGradientClasses: Record<string, string> = {
+    indigo: 'bg-gradient-to-br from-indigo-500 via-indigo-600 to-violet-700 shadow-md shadow-indigo-500/20 dark:shadow-indigo-500/10',
+    emerald: 'bg-gradient-to-br from-emerald-400 via-emerald-500 to-teal-600 shadow-md shadow-emerald-500/20 dark:shadow-emerald-500/10',
+    amber: 'bg-gradient-to-br from-amber-400 via-amber-500 to-orange-500 shadow-md shadow-amber-500/20 dark:shadow-amber-500/10',
+    violet: 'bg-gradient-to-br from-violet-400 via-violet-500 to-fuchsia-600 shadow-md shadow-violet-500/20 dark:shadow-violet-500/10',
+    rose: 'bg-gradient-to-br from-rose-400 via-rose-500 to-pink-600 shadow-md shadow-rose-500/20 dark:shadow-rose-500/10',
+    cyan: 'bg-gradient-to-br from-cyan-400 via-cyan-500 to-blue-600 shadow-md shadow-cyan-500/20 dark:shadow-cyan-500/10',
+    fuchsia: 'bg-gradient-to-br from-fuchsia-400 via-fuchsia-500 to-purple-600 shadow-md shadow-fuchsia-500/20 dark:shadow-fuchsia-500/10',
+    teal: 'bg-gradient-to-br from-teal-400 via-teal-500 to-emerald-600 shadow-md shadow-teal-500/20 dark:shadow-teal-500/10'
+  };
+
   // Applications Database (43 items across Zoho's core domains)
   const applications: AppItem[] = [
     // Sales & Marketing
@@ -483,15 +495,15 @@ export default function AllProducts() {
                 <path d="M12 2L2 22h20L12 2zm0 4.5l6.5 12h-13L12 6.5z" fill="white" />
               </svg>
             </div>
-            <span className="font-semibold text-lg tracking-tight text-neutral-900 dark:text-white">Aether Hub</span>
+            <span className="font-bold text-xl tracking-tight text-neutral-900 dark:text-white">Aether Hub</span>
           </a>
 
           <div className="flex items-center gap-4">
             <button
               onClick={handleOpenWizard}
-              className="px-4 py-2 text-xs sm:text-[13px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-200/20 hover:bg-indigo-100/50 dark:bg-indigo-950/30 dark:border-indigo-900/30 dark:text-indigo-400 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
+              className="px-5 py-2.5 text-xs sm:text-[14px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-200/20 hover:bg-indigo-100/50 dark:bg-indigo-950/30 dark:border-indigo-900/30 dark:text-indigo-400 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
             >
-              <HelpCircle size={14} className="animate-pulse" />
+              <HelpCircle size={15} className="animate-pulse" />
               <span className="hidden sm:inline">Product Finder</span>
             </button>
 
@@ -524,14 +536,14 @@ export default function AllProducts() {
                 <span>UNIFIED ENTERPRISE OPERATING SUITE</span>
               </span>
               
-              <h1 className="text-3xl sm:text-5xl font-black text-neutral-900 dark:text-white leading-[1.1] tracking-tight">
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-neutral-900 dark:text-white leading-[1.05] tracking-tight">
                 Aether One:{' '}
                 <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-violet-500 to-fuchsia-600 dark:from-indigo-400 dark:via-purple-400 dark:to-pink-500 text-glow">
                   The ultimate operating shell.
                 </span>
               </h1>
               
-              <p className="text-[14px] sm:text-base text-neutral-500 dark:text-neutral-400 leading-relaxed max-w-xl">
+              <p className="text-base sm:text-lg text-neutral-500 dark:text-neutral-400 leading-relaxed max-w-2xl">
                 Consolidate your entire business software stack. Access all 40+ spatial databases, cognitive reasoners, billing portals, HR portals, and IT endpoints with one single billing license.
               </p>
 
@@ -662,7 +674,7 @@ export default function AllProducts() {
             
             {/* Floating Category Navigation Sidebar */}
             <aside className="lg:col-span-3 lg:sticky lg:top-32 space-y-2 select-none">
-              <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-neutral-400 dark:text-neutral-500 px-3 mb-4">
+              <h4 className="text-[11px] font-extrabold uppercase tracking-widest text-neutral-400 dark:text-neutral-550 px-3 mb-4">
                 FILTER CATEGORY
               </h4>
               
@@ -673,7 +685,7 @@ export default function AllProducts() {
                     <button
                       key={cat}
                       onClick={() => handleScrollToCategory(cat)}
-                      className={`relative w-full text-left px-4 py-3 rounded-xl text-xs sm:text-[13px] font-semibold transition-all duration-200 shrink-0 cursor-pointer ${
+                      className={`relative w-full text-left px-4 py-3 rounded-xl text-[13px] sm:text-[14px] font-bold transition-all duration-200 shrink-0 cursor-pointer ${
                         isSelected
                           ? 'text-indigo-600 dark:text-white bg-white dark:bg-neutral-900 shadow-sm border border-neutral-200/50 dark:border-neutral-800'
                           : 'text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-250 hover:bg-neutral-100/40 dark:hover:bg-neutral-900/10'
@@ -691,10 +703,10 @@ export default function AllProducts() {
               
               {categories.filter(c => activeCategory === 'All' || c === activeCategory).map((catName) => {
                 if (catName === 'All') return null;
-
+ 
                 const catApps = filteredApps.filter(app => app.category === catName);
                 if (catApps.length === 0) return null;
-
+ 
                 return (
                   <div
                     key={catName}
@@ -703,7 +715,7 @@ export default function AllProducts() {
                   >
                     {/* Category Section Header */}
                     <div className="flex items-center justify-between border-b border-neutral-200/40 dark:border-neutral-800/80 pb-3">
-                      <h3 className="text-[14px] sm:text-base font-bold text-neutral-800 dark:text-neutral-200">
+                      <h3 className="text-base sm:text-lg font-extrabold text-neutral-900 dark:text-white tracking-tight">
                         {catName}
                       </h3>
                       <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-neutral-100 dark:bg-neutral-900 text-neutral-505">
@@ -737,8 +749,8 @@ export default function AllProducts() {
 
                               <div>
                                 <div className="flex items-center justify-between mb-4">
-                                  <div className="w-8.5 h-8.5 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-600 dark:text-neutral-400 group-hover:scale-105 transition-transform">
-                                    {app.icon}
+                                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white ${iconGradientClasses[app.accent] || 'bg-neutral-100'} group-hover:scale-108 transition-all duration-300`}>
+                                    {React.cloneElement(app.icon as React.ReactElement<{ className?: string; size?: number }>, { className: 'text-white', size: 20 })}
                                   </div>
                                   
                                   {app.popular && (
@@ -748,21 +760,21 @@ export default function AllProducts() {
                                   )}
                                 </div>
 
-                                <h4 className={`text-[14px] sm:text-[15px] font-bold tracking-tight flex items-center gap-1 transition-colors ${accentClasses[app.accent]?.text}`}>
+                                <h4 className="text-[17px] sm:text-[19px] font-extrabold tracking-tight text-neutral-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 flex items-center gap-1 transition-colors duration-200">
                                   <span>{app.name}</span>
-                                  <ArrowUpRight size={12} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-200" />
+                                  <ArrowUpRight size={14} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-200" />
                                 </h4>
                                 
-                                <p className="text-[11px] font-semibold text-neutral-800 dark:text-neutral-300 block mt-1 tracking-tight">
+                                <p className="text-[13px] sm:text-[14px] font-semibold text-neutral-700 dark:text-neutral-300 block mt-1.5 tracking-tight leading-snug">
                                   {app.tagline}
                                 </p>
 
-                                <p className="mt-2.5 text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed font-normal">
+                                <p className="mt-2.5 text-xs sm:text-[13px] text-neutral-500 dark:text-neutral-400 leading-relaxed font-normal">
                                   {app.desc}
                                 </p>
                               </div>
 
-                              <div className="mt-5 pt-3 border-t border-neutral-100 dark:border-neutral-800/80 w-full flex items-center justify-between text-[10px] text-neutral-400 font-semibold group-hover:text-neutral-800 dark:group-hover:text-white transition-colors">
+                              <div className="mt-5 pt-3 border-t border-neutral-100 dark:border-neutral-800/80 w-full flex items-center justify-between text-[11px] text-neutral-400 font-semibold group-hover:text-neutral-800 dark:group-hover:text-white transition-colors">
                                 <span>Configure Node</span>
                                 <span className="text-neutral-300 dark:text-neutral-700">→</span>
                               </div>
@@ -788,21 +800,21 @@ export default function AllProducts() {
                                   : `border-neutral-200/50 dark:border-neutral-800 ${accentClasses[app.accent]?.border}`
                               }`}
                             >
-                              <div className="flex items-center gap-3.5 flex-1 pr-4">
-                                <div className="w-7 h-7 rounded-md bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-500">
-                                  {app.icon}
+                              <div className="flex items-center gap-4 flex-1 pr-4">
+                                <div className={`w-9 h-9 rounded-lg flex items-center justify-center text-white shrink-0 ${iconGradientClasses[app.accent] || 'bg-neutral-100'} group-hover:scale-105 transition-all duration-300`}>
+                                  {React.cloneElement(app.icon as React.ReactElement<{ className?: string; size?: number }>, { className: 'text-white', size: 18 })}
                                 </div>
                                 <div>
-                                  <h4 className={`text-[13px] sm:text-[14px] font-bold tracking-tight flex items-center gap-1 transition-colors ${accentClasses[app.accent]?.text}`}>
+                                  <h4 className="text-[14px] sm:text-[15.5px] font-bold tracking-tight text-neutral-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 flex items-center gap-1 transition-colors duration-200">
                                     <span>{app.name}</span>
                                   </h4>
-                                  <span className="text-xs text-neutral-500 dark:text-neutral-400 font-medium">
+                                  <span className="text-xs sm:text-[13px] text-neutral-550 dark:text-neutral-400 font-medium mt-0.5 block leading-tight">
                                     {app.tagline}
                                   </span>
                                 </div>
                               </div>
 
-                              <div className="text-[11px] text-neutral-400 dark:text-neutral-500 hidden md:block max-w-sm flex-1 truncate font-normal leading-normal">
+                              <div className="text-xs sm:text-[13px] text-neutral-400 dark:text-neutral-500 hidden md:block max-w-sm flex-1 truncate font-normal leading-normal">
                                 {app.desc}
                               </div>
 
