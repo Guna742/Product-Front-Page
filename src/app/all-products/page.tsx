@@ -479,6 +479,15 @@ export default function AllProducts() {
     });
   };
 
+  const handleCardMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const card = e.currentTarget;
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    card.style.setProperty('--mouse-x', `${x}px`);
+    card.style.setProperty('--mouse-y', `${y}px`);
+  };
+
   return (
     <div className="relative min-h-screen bg-neutral-50 dark:bg-neutral-950 transition-colors duration-300">
       
@@ -572,7 +581,7 @@ export default function AllProducts() {
 
             {/* Graphic sidebar mock inside hero showcase */}
             <div className="lg:col-span-5 hidden lg:flex items-center justify-center">
-              <div className="w-full max-w-sm aspect-[4/3] rounded-2xl border border-neutral-250/50 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950 p-6 flex flex-col justify-between shadow-md relative overflow-hidden">
+              <div className="w-full max-w-sm aspect-[4/3] rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950 p-6 flex flex-col justify-between shadow-md relative overflow-hidden">
                 <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-indigo-500 to-transparent animate-scanline" />
                 
                 <div className="flex items-center justify-between border-b border-neutral-200 dark:border-neutral-800/80 pb-3">
@@ -583,15 +592,15 @@ export default function AllProducts() {
                 <div className="space-y-2.5 py-4">
                   <div className="h-6.5 rounded-lg bg-white dark:bg-neutral-900 border border-neutral-200/50 dark:border-neutral-800/80 px-3 flex items-center justify-between text-[11px] text-neutral-500 select-none">
                     <span>Aether CRM + Aether Flow</span>
-                    <span className="text-indigo-550 font-bold">✓ Bound</span>
+                    <span className="text-indigo-600 font-bold">✓ Bound</span>
                   </div>
                   <div className="h-6.5 rounded-lg bg-white dark:bg-neutral-900 border border-neutral-200/50 dark:border-neutral-800/80 px-3 flex items-center justify-between text-[11px] text-neutral-500 select-none">
                     <span>Aether Books + Subscriptions</span>
-                    <span className="text-emerald-555 font-bold">✓ Bound</span>
+                    <span className="text-emerald-600 font-bold">✓ Bound</span>
                   </div>
                   <div className="h-6.5 rounded-lg bg-white dark:bg-neutral-900 border border-neutral-200/50 dark:border-neutral-800/80 px-3 flex items-center justify-between text-[11px] text-neutral-500 select-none">
                     <span>Aether Mail + Cliq Chat</span>
-                    <span className="text-amber-555 font-bold">✓ Bound</span>
+                    <span className="text-amber-500 font-bold">✓ Bound</span>
                   </div>
                 </div>
 
@@ -646,7 +655,7 @@ export default function AllProducts() {
                 onClick={() => setViewMode('grid')}
                 className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all cursor-pointer ${
                   viewMode === 'grid'
-                    ? 'bg-white dark:bg-neutral-850 text-indigo-600 dark:text-white shadow-sm'
+                    ? 'bg-white dark:bg-neutral-800 text-indigo-600 dark:text-white shadow-sm'
                     : 'text-neutral-400 hover:text-neutral-600'
                 }`}
                 aria-label="Grid View"
@@ -674,7 +683,7 @@ export default function AllProducts() {
             
             {/* Floating Category Navigation Sidebar */}
             <aside className="lg:col-span-3 lg:sticky lg:top-32 space-y-2 select-none">
-              <h4 className="text-[11px] font-extrabold uppercase tracking-widest text-neutral-400 dark:text-neutral-550 px-3 mb-4">
+              <h4 className="text-[11px] font-extrabold uppercase tracking-widest text-neutral-400 dark:text-neutral-500 px-3 mb-4">
                 FILTER CATEGORY
               </h4>
               
@@ -688,7 +697,7 @@ export default function AllProducts() {
                       className={`relative w-full text-left px-4 py-3 rounded-xl text-[13px] sm:text-[14px] font-bold transition-all duration-200 shrink-0 cursor-pointer ${
                         isSelected
                           ? 'text-indigo-600 dark:text-white bg-white dark:bg-neutral-900 shadow-sm border border-neutral-200/50 dark:border-neutral-800'
-                          : 'text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-250 hover:bg-neutral-100/40 dark:hover:bg-neutral-900/10'
+                          : 'text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200 hover:bg-neutral-100/40 dark:hover:bg-neutral-900/10'
                       }`}
                     >
                       <span>{cat}</span>
@@ -718,7 +727,7 @@ export default function AllProducts() {
                       <h3 className="text-base sm:text-lg font-extrabold text-neutral-900 dark:text-white tracking-tight">
                         {catName}
                       </h3>
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-neutral-100 dark:bg-neutral-900 text-neutral-505">
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-neutral-100 dark:bg-neutral-900 text-neutral-500">
                         {catApps.length} Application{catApps.length !== 1 && 's'}
                       </span>
                     </div>
@@ -739,11 +748,12 @@ export default function AllProducts() {
                               animate={{ opacity: 1, scale: 1 }}
                               exit={{ opacity: 0, scale: 0.96 }}
                               transition={{ duration: 0.25 }}
-                              className={`group relative overflow-hidden rounded-2.5xl border bg-white dark:bg-neutral-900 p-6 flex flex-col justify-between hover:scale-102 transition-all duration-300 select-none ${
+                              className={`group relative overflow-hidden rounded-2.5xl border bg-white dark:bg-neutral-900 p-6 flex flex-col justify-between hover:scale-102 transition-all duration-300 select-none spotlight-card ${
                                 highlightedApps.includes(app.id)
                                   ? 'border-indigo-500 ring-2 ring-indigo-500/20 shadow-lg shadow-indigo-500/10'
                                   : `border-neutral-200/60 dark:border-neutral-800 ${accentClasses[app.accent]?.border} ${accentClasses[app.accent]?.shadow}`
                               }`}
+                              onMouseMove={handleCardMouseMove}
                             >
                               <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
 
@@ -794,11 +804,12 @@ export default function AllProducts() {
                               initial={{ opacity: 0, y: 10 }}
                               animate={{ opacity: 1, y: 0 }}
                               exit={{ opacity: 0, y: 10 }}
-                              className={`group w-full px-5 py-4 rounded-xl border bg-white dark:bg-neutral-900 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-all select-none hover:shadow-sm ${
+                              className={`group w-full px-5 py-4 rounded-xl border bg-white dark:bg-neutral-900 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-all select-none hover:shadow-sm spotlight-card ${
                                 highlightedApps.includes(app.id)
                                   ? 'border-indigo-500 ring-1 ring-indigo-500/20'
                                   : `border-neutral-200/50 dark:border-neutral-800 ${accentClasses[app.accent]?.border}`
                               }`}
+                              onMouseMove={handleCardMouseMove}
                             >
                               <div className="flex items-center gap-4 flex-1 pr-4">
                                 <div className={`w-9 h-9 rounded-lg flex items-center justify-center text-white shrink-0 ${iconGradientClasses[app.accent] || 'bg-neutral-100'} group-hover:scale-105 transition-all duration-300`}>
@@ -808,7 +819,7 @@ export default function AllProducts() {
                                   <h4 className="text-[14px] sm:text-[15.5px] font-bold tracking-tight text-neutral-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 flex items-center gap-1 transition-colors duration-200">
                                     <span>{app.name}</span>
                                   </h4>
-                                  <span className="text-xs sm:text-[13px] text-neutral-550 dark:text-neutral-400 font-medium mt-0.5 block leading-tight">
+                                  <span className="text-xs sm:text-[13px] text-neutral-500 dark:text-neutral-400 font-medium mt-0.5 block leading-tight">
                                     {app.tagline}
                                   </span>
                                 </div>
@@ -883,7 +894,7 @@ export default function AllProducts() {
             >
               <button
                 onClick={() => setIsWizardOpen(false)}
-                className="absolute top-5 right-5 w-8 h-8 rounded-full flex items-center justify-center hover:bg-neutral-105 dark:hover:bg-neutral-800 transition-colors text-neutral-400 hover:text-neutral-700 cursor-pointer"
+                className="absolute top-5 right-5 w-8 h-8 rounded-full flex items-center justify-center hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors text-neutral-400 hover:text-neutral-700 cursor-pointer"
               >
                 <X size={15} />
               </button>
@@ -989,7 +1000,7 @@ function WizardOptionButton({ label, onClick }: { label: string; onClick: () => 
   return (
     <button
       onClick={onClick}
-      className="w-full text-left px-5 py-3.5 text-xs sm:text-[13px] font-bold text-neutral-750 hover:text-indigo-600 dark:text-neutral-300 dark:hover:text-white bg-neutral-50 hover:bg-indigo-50/50 dark:bg-neutral-950/60 dark:hover:bg-indigo-950/20 border border-neutral-200 dark:border-neutral-800 hover:border-indigo-500/20 rounded-2xl transition-all cursor-pointer select-none"
+      className="w-full text-left px-5 py-3.5 text-xs sm:text-[13px] font-bold text-neutral-700 hover:text-indigo-600 dark:text-neutral-300 dark:hover:text-white bg-neutral-50 hover:bg-indigo-50/50 dark:bg-neutral-950/60 dark:hover:bg-indigo-950/20 border border-neutral-200 dark:border-neutral-800 hover:border-indigo-500/20 rounded-2xl transition-all cursor-pointer select-none"
     >
       {label}
     </button>
