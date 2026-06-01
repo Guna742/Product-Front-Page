@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
 import { 
   Search, LayoutGrid, List, Compass, HelpCircle, X, ArrowRight, Check, ExternalLink, 
   Terminal, Shield, Keyboard, Zap, GitBranch, Layers, Lock, Sliders, Cpu, Sparkles, 
@@ -17,7 +17,7 @@ interface AppItem {
   tagline: string;
   desc: string;
   category: string;
-  accent: string; // Tailwind color class like 'indigo'
+  accent: string; // HSL brand mapping
   popular: boolean;
   icon: React.ReactNode;
 }
@@ -35,8 +35,60 @@ export default function AllProducts() {
   const [wizardRecommended, setWizardRecommended] = useState<string[]>([]);
   const [highlightedApps, setHighlightedApps] = useState<string[]>([]);
 
-  // Category anchor refs for smooth category jump scrolling
+  // Category Refs
   const categoryRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  // Category specific premium glow and grading classes
+  const accentClasses: Record<string, { border: string; text: string; bg: string; shadow: string }> = {
+    indigo: {
+      border: 'hover:border-indigo-500/50 dark:hover:border-indigo-500/30',
+      text: 'text-indigo-600 dark:text-indigo-400',
+      bg: 'bg-indigo-50/50 dark:bg-indigo-950/20 border-indigo-200/10 hover:bg-indigo-100/30',
+      shadow: 'hover:shadow-lg hover:shadow-indigo-500/5'
+    },
+    emerald: {
+      border: 'hover:border-emerald-500/50 dark:hover:border-emerald-500/30',
+      text: 'text-emerald-600 dark:text-emerald-400',
+      bg: 'bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200/10 hover:bg-emerald-100/30',
+      shadow: 'hover:shadow-lg hover:shadow-emerald-500/5'
+    },
+    amber: {
+      border: 'hover:border-amber-500/50 dark:hover:border-amber-500/30',
+      text: 'text-amber-600 dark:text-amber-500',
+      bg: 'bg-amber-50/50 dark:bg-amber-950/20 border-amber-200/10 hover:bg-amber-100/30',
+      shadow: 'hover:shadow-lg hover:shadow-amber-500/5'
+    },
+    violet: {
+      border: 'hover:border-violet-500/50 dark:hover:border-violet-500/30',
+      text: 'text-violet-600 dark:text-violet-400',
+      bg: 'bg-violet-50/50 dark:bg-violet-950/20 border-violet-200/10 hover:bg-violet-100/30',
+      shadow: 'hover:shadow-lg hover:shadow-violet-500/5'
+    },
+    rose: {
+      border: 'hover:border-rose-500/50 dark:hover:border-rose-500/30',
+      text: 'text-rose-600 dark:text-rose-455',
+      bg: 'bg-rose-50/50 dark:bg-rose-950/20 border-rose-200/10 hover:bg-rose-100/30',
+      shadow: 'hover:shadow-lg hover:shadow-rose-500/5'
+    },
+    cyan: {
+      border: 'hover:border-cyan-500/50 dark:hover:border-cyan-500/30',
+      text: 'text-cyan-600 dark:text-cyan-400',
+      bg: 'bg-cyan-50/50 dark:bg-cyan-950/20 border-cyan-200/10 hover:bg-cyan-100/30',
+      shadow: 'hover:shadow-lg hover:shadow-cyan-500/5'
+    },
+    fuchsia: {
+      border: 'hover:border-fuchsia-500/50 dark:hover:border-fuchsia-500/30',
+      text: 'text-fuchsia-600 dark:text-fuchsia-400',
+      bg: 'bg-fuchsia-50/50 dark:bg-fuchsia-950/20 border-fuchsia-200/10 hover:bg-fuchsia-100/30',
+      shadow: 'hover:shadow-lg hover:shadow-fuchsia-500/5'
+    },
+    teal: {
+      border: 'hover:border-teal-500/50 dark:hover:border-teal-500/30',
+      text: 'text-teal-600 dark:text-teal-400',
+      bg: 'bg-teal-50/50 dark:bg-teal-950/20 border-teal-200/10 hover:bg-teal-100/30',
+      shadow: 'hover:shadow-lg hover:shadow-teal-500/5'
+    }
+  };
 
   // Applications Database (43 items across Zoho's core domains)
   const applications: AppItem[] = [
@@ -323,7 +375,7 @@ export default function AllProducts() {
     return ['All', ...list];
   }, [applications]);
 
-  // Handle live filtered apps based on search query, category selection, and product wizard highlights
+  // Filter apps
   const filteredApps = useMemo(() => {
     return applications.filter((app) => {
       const matchesSearch =
@@ -341,10 +393,10 @@ export default function AllProducts() {
     });
   }, [search, activeCategory, highlightedApps, applications]);
 
-  // Smooth scroll logic to section elements on page
+  // Smooth scroll
   const handleScrollToCategory = (catName: string) => {
     setActiveCategory(catName);
-    setHighlightedApps([]); // Reset wizard highlights when user selects another category
+    setHighlightedApps([]);
     if (catName === 'All') {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
@@ -364,7 +416,6 @@ export default function AllProducts() {
     }
   };
 
-  // Launch Product Finder wizard modal
   const handleOpenWizard = () => {
     setWizardStep(1);
     setWizardAnswers({});
@@ -372,7 +423,6 @@ export default function AllProducts() {
     setIsWizardOpen(true);
   };
 
-  // Select option in Finder wizard
   const handleSelectOption = (questionKey: string, val: string) => {
     const nextAnswers = { ...wizardAnswers, [questionKey]: val };
     setWizardAnswers(nextAnswers);
@@ -380,7 +430,6 @@ export default function AllProducts() {
     if (wizardStep < 3) {
       setWizardStep((prev) => prev + 1);
     } else {
-      // Calculate Recommendations based on user profile logic
       let recs: string[] = [];
       if (nextAnswers.objective === 'sales') {
         recs = ['crm', 'social', 'campaigns'];
@@ -397,23 +446,31 @@ export default function AllProducts() {
     }
   };
 
-  // Apply recommendations from Product Wizard
   const handleApplyRecommendations = () => {
     setHighlightedApps(wizardRecommended);
     setIsWizardOpen(false);
 
     confetti({
-      particleCount: 100,
-      spread: 60,
-      origin: { y: 0.6 },
+      particleCount: 125,
+      spread: 70,
+      origin: { y: 0.65 },
       colors: ['#6366f1', '#10b981', '#a855f7'],
+    });
+  };
+
+  const handlePlanSelect = (name: string) => {
+    confetti({
+      particleCount: 80,
+      spread: 60,
+      origin: { y: 0.7 },
+      colors: ['#6366f1', '#10b981'],
     });
   };
 
   return (
     <div className="relative min-h-screen bg-neutral-50 dark:bg-neutral-950 transition-colors duration-300">
       
-      {/* Dynamic blurred radial backdrop */}
+      {/* Mesh backdrops */}
       <div className="absolute inset-0 bg-radial-gradient pointer-events-none" />
       <div className="absolute inset-0 bg-grid-pattern opacity-60 pointer-events-none" />
 
@@ -432,9 +489,9 @@ export default function AllProducts() {
           <div className="flex items-center gap-4">
             <button
               onClick={handleOpenWizard}
-              className="px-4 py-2 text-xs sm:text-[13px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-200/20 hover:bg-indigo-100/50 dark:bg-indigo-950/30 dark:border-indigo-900/30 dark:text-indigo-400 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer"
+              className="px-4 py-2 text-xs sm:text-[13px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-200/20 hover:bg-indigo-100/50 dark:bg-indigo-950/30 dark:border-indigo-900/30 dark:text-indigo-400 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
             >
-              <HelpCircle size={14} />
+              <HelpCircle size={14} className="animate-pulse" />
               <span className="hidden sm:inline">Product Finder</span>
             </button>
 
@@ -458,7 +515,6 @@ export default function AllProducts() {
         
         {/* SPOTLIGHT HERO ECOSYSTEM BANNER */}
         <div className="w-full rounded-3xl border border-neutral-200/60 dark:border-neutral-800 bg-white dark:bg-neutral-900/60 p-6 sm:p-10 mb-16 relative overflow-hidden shadow-sm">
-          {/* mesh light inside hero */}
           <div className="absolute top-[40%] right-[10%] w-80 h-80 rounded-full bg-indigo-500/5 blur-[120px] pointer-events-none" />
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
@@ -469,11 +525,14 @@ export default function AllProducts() {
               </span>
               
               <h1 className="text-3xl sm:text-5xl font-black text-neutral-900 dark:text-white leading-[1.1] tracking-tight">
-                Aether One: The ultimate operating shell.
+                Aether One:{' '}
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-violet-500 to-fuchsia-600 dark:from-indigo-400 dark:via-purple-400 dark:to-pink-500 text-glow">
+                  The ultimate operating shell.
+                </span>
               </h1>
               
               <p className="text-[14px] sm:text-base text-neutral-500 dark:text-neutral-400 leading-relaxed max-w-xl">
-                Consolidate your entire business software stack. Access all 40+ spatial databases, cognitive reasoners, billing portals, HR portals, andIT endpoints with one single billing license.
+                Consolidate your entire business software stack. Access all 40+ spatial databases, cognitive reasoners, billing portals, HR portals, and IT endpoints with one single billing license.
               </p>
 
               <div className="flex flex-wrap gap-4 pt-3">
@@ -501,7 +560,9 @@ export default function AllProducts() {
 
             {/* Graphic sidebar mock inside hero showcase */}
             <div className="lg:col-span-5 hidden lg:flex items-center justify-center">
-              <div className="w-full max-w-sm aspect-[4/3] rounded-2xl border border-neutral-250/50 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950 p-6 flex flex-col justify-between shadow-md">
+              <div className="w-full max-w-sm aspect-[4/3] rounded-2xl border border-neutral-250/50 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-950 p-6 flex flex-col justify-between shadow-md relative overflow-hidden">
+                <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-indigo-500 to-transparent animate-scanline" />
+                
                 <div className="flex items-center justify-between border-b border-neutral-200 dark:border-neutral-800/80 pb-3">
                   <span className="text-[11px] font-bold text-neutral-400 font-mono">CORE_STACKS_RECORDS</span>
                   <span className="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse" />
@@ -510,15 +571,15 @@ export default function AllProducts() {
                 <div className="space-y-2.5 py-4">
                   <div className="h-6.5 rounded-lg bg-white dark:bg-neutral-900 border border-neutral-200/50 dark:border-neutral-800/80 px-3 flex items-center justify-between text-[11px] text-neutral-500 select-none">
                     <span>Aether CRM + Aether Flow</span>
-                    <span className="text-indigo-500 font-bold">✓ Bound</span>
+                    <span className="text-indigo-550 font-bold">✓ Bound</span>
                   </div>
                   <div className="h-6.5 rounded-lg bg-white dark:bg-neutral-900 border border-neutral-200/50 dark:border-neutral-800/80 px-3 flex items-center justify-between text-[11px] text-neutral-500 select-none">
                     <span>Aether Books + Subscriptions</span>
-                    <span className="text-emerald-500 font-bold">✓ Bound</span>
+                    <span className="text-emerald-555 font-bold">✓ Bound</span>
                   </div>
                   <div className="h-6.5 rounded-lg bg-white dark:bg-neutral-900 border border-neutral-200/50 dark:border-neutral-800/80 px-3 flex items-center justify-between text-[11px] text-neutral-500 select-none">
                     <span>Aether Mail + Cliq Chat</span>
-                    <span className="text-amber-500 font-bold">✓ Bound</span>
+                    <span className="text-amber-555 font-bold">✓ Bound</span>
                   </div>
                 </div>
 
@@ -595,186 +656,187 @@ export default function AllProducts() {
           </div>
         </div>
 
-        {/* MAIN LAYOUT SPLIT (Sidebar Left, Apps Right) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-          
-          {/* Floating Category Navigation Sidebar */}
-          <aside className="lg:col-span-3 lg:sticky lg:top-32 space-y-2 select-none">
-            <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-neutral-400 dark:text-neutral-500 px-3 mb-4">
-              FILTER CATEGORY
-            </h4>
+        {/* MAIN LAYOUT SPLIT (Sidebar Left, Apps Right) - wrapped in LayoutGroup */}
+        <LayoutGroup>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
             
-            <div className="flex flex-row lg:flex-col overflow-x-auto lg:overflow-x-visible pb-3 lg:pb-0 gap-1.5 scrollbar-none">
-              {categories.map((cat) => {
-                const isSelected = activeCategory === cat;
+            {/* Floating Category Navigation Sidebar */}
+            <aside className="lg:col-span-3 lg:sticky lg:top-32 space-y-2 select-none">
+              <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-neutral-400 dark:text-neutral-500 px-3 mb-4">
+                FILTER CATEGORY
+              </h4>
+              
+              <div className="flex flex-row lg:flex-col overflow-x-auto lg:overflow-x-visible pb-3 lg:pb-0 gap-1.5 scrollbar-none">
+                {categories.map((cat) => {
+                  const isSelected = activeCategory === cat;
+                  return (
+                    <button
+                      key={cat}
+                      onClick={() => handleScrollToCategory(cat)}
+                      className={`relative w-full text-left px-4 py-3 rounded-xl text-xs sm:text-[13px] font-semibold transition-all duration-200 shrink-0 cursor-pointer ${
+                        isSelected
+                          ? 'text-indigo-600 dark:text-white bg-white dark:bg-neutral-900 shadow-sm border border-neutral-200/50 dark:border-neutral-800'
+                          : 'text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-250 hover:bg-neutral-100/40 dark:hover:bg-neutral-900/10'
+                      }`}
+                    >
+                      <span>{cat}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </aside>
+
+            {/* Catalog Lists */}
+            <div className="lg:col-span-9 space-y-16">
+              
+              {categories.filter(c => activeCategory === 'All' || c === activeCategory).map((catName) => {
+                if (catName === 'All') return null;
+
+                const catApps = filteredApps.filter(app => app.category === catName);
+                if (catApps.length === 0) return null;
+
                 return (
-                  <button
-                    key={cat}
-                    onClick={() => handleScrollToCategory(cat)}
-                    className={`relative w-full text-left px-4 py-3 rounded-xl text-xs sm:text-[13px] font-semibold transition-all duration-200 shrink-0 cursor-pointer ${
-                      isSelected
-                        ? 'text-indigo-600 dark:text-white bg-white dark:bg-neutral-900 shadow-sm border border-neutral-200/50 dark:border-neutral-800'
-                        : 'text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-250 hover:bg-neutral-100/40 dark:hover:bg-neutral-900/10'
-                    }`}
+                  <div
+                    key={catName}
+                    ref={(el) => { categoryRefs.current[catName] = el; }}
+                    className="space-y-6 scroll-mt-28"
                   >
-                    <span>{cat}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </aside>
+                    {/* Category Section Header */}
+                    <div className="flex items-center justify-between border-b border-neutral-200/40 dark:border-neutral-800/80 pb-3">
+                      <h3 className="text-[14px] sm:text-base font-bold text-neutral-800 dark:text-neutral-200">
+                        {catName}
+                      </h3>
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-neutral-100 dark:bg-neutral-900 text-neutral-505">
+                        {catApps.length} Application{catApps.length !== 1 && 's'}
+                      </span>
+                    </div>
 
-          {/* Catalog Lists */}
-          <div className="lg:col-span-9 space-y-16">
-            
-            {categories.filter(c => activeCategory === 'All' || c === activeCategory).map((catName) => {
-              if (catName === 'All') return null;
+                    {/* Layout switcher rendering */}
+                    <AnimatePresence mode="popLayout">
+                      {viewMode === 'grid' ? (
+                        // Bento Grid Mode
+                        <motion.div
+                          layout
+                          className="grid grid-cols-1 sm:grid-cols-2 gap-5"
+                        >
+                          {catApps.map((app) => (
+                            <motion.div
+                              key={app.id}
+                              layout
+                              initial={{ opacity: 0, scale: 0.96 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              exit={{ opacity: 0, scale: 0.96 }}
+                              transition={{ duration: 0.25 }}
+                              className={`group relative overflow-hidden rounded-2.5xl border bg-white dark:bg-neutral-900 p-6 flex flex-col justify-between hover:scale-102 transition-all duration-300 select-none ${
+                                highlightedApps.includes(app.id)
+                                  ? 'border-indigo-500 ring-2 ring-indigo-500/20 shadow-lg shadow-indigo-500/10'
+                                  : `border-neutral-200/60 dark:border-neutral-800 ${accentClasses[app.accent]?.border} ${accentClasses[app.accent]?.shadow}`
+                              }`}
+                            >
+                              <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
 
-              // Filter products specific to this category heading
-              const catApps = filteredApps.filter(app => app.category === catName);
-              if (catApps.length === 0) return null;
+                              <div>
+                                <div className="flex items-center justify-between mb-4">
+                                  <div className="w-8.5 h-8.5 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-600 dark:text-neutral-400 group-hover:scale-105 transition-transform">
+                                    {app.icon}
+                                  </div>
+                                  
+                                  {app.popular && (
+                                    <span className={`text-[9px] px-2 py-0.5 rounded font-extrabold uppercase tracking-wide ${accentClasses[app.accent]?.bg} ${accentClasses[app.accent]?.text}`}>
+                                      Popular
+                                    </span>
+                                  )}
+                                </div>
 
-              return (
-                <div
-                  key={catName}
-                  ref={(el) => { categoryRefs.current[catName] = el; }}
-                  className="space-y-6 scroll-mt-28"
-                >
-                  {/* Category Section Header */}
-                  <div className="flex items-center justify-between border-b border-neutral-200/40 dark:border-neutral-800/80 pb-3">
-                    <h3 className="text-[14px] sm:text-base font-bold text-neutral-800 dark:text-neutral-200">
-                      {catName}
-                    </h3>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-neutral-100 dark:bg-neutral-900 text-neutral-500">
-                      {catApps.length} Application{catApps.length !== 1 && 's'}
-                    </span>
-                  </div>
+                                <h4 className={`text-[14px] sm:text-[15px] font-bold tracking-tight flex items-center gap-1 transition-colors ${accentClasses[app.accent]?.text}`}>
+                                  <span>{app.name}</span>
+                                  <ArrowUpRight size={12} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-200" />
+                                </h4>
+                                
+                                <p className="text-[11px] font-semibold text-neutral-800 dark:text-neutral-300 block mt-1 tracking-tight">
+                                  {app.tagline}
+                                </p>
 
-                  {/* Visual Layout rendering (Bento Grid View vs Compact List View) */}
-                  <AnimatePresence mode="popLayout">
-                    {viewMode === 'grid' ? (
-                      // Bento Grid Mode
-                      <motion.div
-                        layout
-                        className="grid grid-cols-1 sm:grid-cols-2 gap-5"
-                      >
-                        {catApps.map((app) => (
-                          <motion.div
-                            key={app.id}
-                            layout
-                            initial={{ opacity: 0, scale: 0.96 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.96 }}
-                            transition={{ duration: 0.25 }}
-                            className={`group relative overflow-hidden rounded-2.5xl border bg-white dark:bg-neutral-900 p-6 flex flex-col justify-between hover:scale-102 hover:shadow-lg transition-all duration-300 select-none ${
-                              highlightedApps.includes(app.id)
-                                ? 'border-indigo-500 ring-2 ring-indigo-500/20'
-                                : 'border-neutral-200/60 dark:border-neutral-800 hover:border-indigo-500/30'
-                            }`}
-                          >
-                            <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                                <p className="mt-2.5 text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed font-normal">
+                                  {app.desc}
+                                </p>
+                              </div>
 
-                            <div>
-                              <div className="flex items-center justify-between mb-4">
-                                <div className="w-8.5 h-8.5 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-600 dark:text-neutral-400 group-hover:scale-105 transition-transform">
+                              <div className="mt-5 pt-3 border-t border-neutral-100 dark:border-neutral-800/80 w-full flex items-center justify-between text-[10px] text-neutral-400 font-semibold group-hover:text-neutral-800 dark:group-hover:text-white transition-colors">
+                                <span>Configure Node</span>
+                                <span className="text-neutral-300 dark:text-neutral-700">→</span>
+                              </div>
+                            </motion.div>
+                          ))}
+                        </motion.div>
+                      ) : (
+                        // Compact List Mode
+                        <motion.div
+                          layout
+                          className="space-y-2.5"
+                        >
+                          {catApps.map((app) => (
+                            <motion.div
+                              key={app.id}
+                              layout
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: 10 }}
+                              className={`group w-full px-5 py-4 rounded-xl border bg-white dark:bg-neutral-900 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-all select-none hover:shadow-sm ${
+                                highlightedApps.includes(app.id)
+                                  ? 'border-indigo-500 ring-1 ring-indigo-500/20'
+                                  : `border-neutral-200/50 dark:border-neutral-800 ${accentClasses[app.accent]?.border}`
+                              }`}
+                            >
+                              <div className="flex items-center gap-3.5 flex-1 pr-4">
+                                <div className="w-7 h-7 rounded-md bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-500">
                                   {app.icon}
                                 </div>
-                                
-                                {app.popular && (
-                                  <span className="text-[9px] px-2 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 font-extrabold uppercase tracking-wide">
-                                    Popular
+                                <div>
+                                  <h4 className={`text-[13px] sm:text-[14px] font-bold tracking-tight flex items-center gap-1 transition-colors ${accentClasses[app.accent]?.text}`}>
+                                    <span>{app.name}</span>
+                                  </h4>
+                                  <span className="text-xs text-neutral-500 dark:text-neutral-400 font-medium">
+                                    {app.tagline}
                                   </span>
-                                )}
+                                </div>
                               </div>
 
-                              <h4 className="text-[14px] sm:text-[15px] font-bold text-neutral-900 dark:text-white tracking-tight flex items-center gap-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                                <span>{app.name}</span>
-                                <ArrowUpRight size={12} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-200" />
-                              </h4>
-                              
-                              <p className="text-[11px] font-semibold text-neutral-800 dark:text-neutral-300 block mt-1 tracking-tight">
-                                {app.tagline}
-                              </p>
-
-                              <p className="mt-2.5 text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed font-normal">
+                              <div className="text-[11px] text-neutral-400 dark:text-neutral-500 hidden md:block max-w-sm flex-1 truncate font-normal leading-normal">
                                 {app.desc}
-                              </p>
-                            </div>
-
-                            <div className="mt-5 pt-3 border-t border-neutral-100 dark:border-neutral-800/80 w-full flex items-center justify-between text-[10px] text-neutral-400 font-semibold group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                              <span>Configure Node</span>
-                              <span className="text-neutral-300 dark:text-neutral-700">→</span>
-                            </div>
-                          </motion.div>
-                        ))}
-                      </motion.div>
-                    ) : (
-                      // Compact List Directory Mode
-                      <motion.div
-                        layout
-                        className="space-y-2.5"
-                      >
-                        {catApps.map((app) => (
-                          <motion.div
-                            key={app.id}
-                            layout
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: 10 }}
-                            className={`group w-full px-5 py-4 rounded-xl border bg-white dark:bg-neutral-900 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:border-indigo-500/30 transition-all select-none hover:shadow-sm ${
-                              highlightedApps.includes(app.id)
-                                ? 'border-indigo-500 ring-1 ring-indigo-500/20'
-                                : 'border-neutral-200/50 dark:border-neutral-800'
-                            }`}
-                          >
-                            <div className="flex items-center gap-3.5 flex-1 pr-4">
-                              <div className="w-7 h-7 rounded-md bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-500">
-                                {app.icon}
                               </div>
-                              <div>
-                                <h4 className="text-[13px] sm:text-[14px] font-bold text-neutral-900 dark:text-white tracking-tight flex items-center gap-1 hover:text-indigo-600 transition-colors">
-                                  <span>{app.name}</span>
-                                </h4>
-                                <span className="text-xs text-neutral-500 dark:text-neutral-400 font-medium">
-                                  {app.tagline}
-                                </span>
+
+                              <div className="flex items-center gap-3 shrink-0 self-end sm:self-auto">
+                                <button
+                                  onClick={() => handlePlanSelect(app.name)}
+                                  className={`text-[10px] font-bold uppercase tracking-wider px-3.5 py-1.5 rounded-lg border transition-colors cursor-pointer ${accentClasses[app.accent]?.bg} ${accentClasses[app.accent]?.text}`}
+                                >
+                                  Deploy Node
+                                </button>
                               </div>
-                            </div>
+                            </motion.div>
+                          ))}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                );
+              })}
 
-                            <div className="text-[11px] text-neutral-400 dark:text-neutral-500 hidden md:block max-w-sm flex-1 truncate font-normal leading-normal">
-                              {app.desc}
-                            </div>
-
-                            <div className="flex items-center gap-3 shrink-0 self-end sm:self-auto">
-                              <button
-                                onClick={() => handlePlanSelect(app.name)}
-                                className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/20 border border-indigo-200/10 hover:bg-indigo-100 px-3.5 py-1.5 rounded-lg transition-colors cursor-pointer"
-                              >
-                                Deploy Node
-                              </button>
-                            </div>
-                          </motion.div>
-                        ))}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+              {filteredApps.length === 0 && (
+                <div className="text-center py-20 bg-white dark:bg-neutral-900 border border-neutral-200/50 dark:border-neutral-800 rounded-3xl p-8 flex flex-col items-center justify-center gap-4 shadow-sm select-none">
+                  <span className="text-xs text-neutral-400 dark:text-neutral-500">No applications match your filtering criteria.</span>
+                  <button
+                    onClick={() => { setSearch(''); setActiveCategory('All'); setHighlightedApps([]); }}
+                    className="px-4 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl transition-colors cursor-pointer"
+                  >
+                    Clear All Filters
+                  </button>
                 </div>
-              );
-            })}
-
-            {filteredApps.length === 0 && (
-              <div className="text-center py-20 bg-white dark:bg-neutral-900 border border-neutral-200/50 dark:border-neutral-800 rounded-3xl p-8 flex flex-col items-center justify-center gap-4 shadow-sm select-none">
-                <span className="text-xs text-neutral-400 dark:text-neutral-500">No applications match your filtering criteria.</span>
-                <button
-                  onClick={() => { setSearch(''); setActiveCategory('All'); setHighlightedApps([]); }}
-                  className="px-4 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl transition-colors cursor-pointer"
-                >
-                  Clear All Filters
-                </button>
-              </div>
-            )}
+              )}
+            </div>
           </div>
-        </div>
+        </LayoutGroup>
       </main>
 
       {/* FLOAT INTERACTIVE FINDER BUTTON */}
@@ -792,7 +854,6 @@ export default function AllProducts() {
       <AnimatePresence>
         {isWizardOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center px-6">
-            {/* dark overlay backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -801,7 +862,6 @@ export default function AllProducts() {
               className="absolute inset-0 bg-neutral-950/60 backdrop-blur-sm"
             />
 
-            {/* Modal Screen */}
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 15 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -809,7 +869,6 @@ export default function AllProducts() {
               transition={{ duration: 0.25, ease: 'easeOut' }}
               className="relative w-full max-w-lg bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-3xl p-6 sm:p-8 shadow-2xl z-10 flex flex-col justify-between min-h-[360px]"
             >
-              {/* Close Button */}
               <button
                 onClick={() => setIsWizardOpen(false)}
                 className="absolute top-5 right-5 w-8 h-8 rounded-full flex items-center justify-center hover:bg-neutral-105 dark:hover:bg-neutral-800 transition-colors text-neutral-400 hover:text-neutral-700 cursor-pointer"
@@ -817,7 +876,6 @@ export default function AllProducts() {
                 <X size={15} />
               </button>
 
-              {/* Progress bars wizard */}
               <div className="flex gap-1.5 mb-6 pr-8 select-none">
                 {[1, 2, 3, 4].map((stepNum) => (
                   <div
@@ -831,7 +889,6 @@ export default function AllProducts() {
                 ))}
               </div>
 
-              {/* Step State machine */}
               <div className="flex-1 flex flex-col justify-center">
                 {wizardStep === 1 && (
                   <div className="space-y-4">
@@ -890,7 +947,7 @@ export default function AllProducts() {
                         return (
                           <span
                             key={id}
-                            className="px-3.5 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 border border-indigo-200/10 font-bold text-xs"
+                            className={`px-3.5 py-1.5 rounded-xl border font-bold text-xs ${accentClasses[matched?.accent || 'indigo']?.bg} ${accentClasses[matched?.accent || 'indigo']?.text}`}
                           >
                             {matched?.name || id}
                           </span>
@@ -916,9 +973,6 @@ export default function AllProducts() {
   );
 }
 
-// ----------------------------------------------------
-// Option buttons helper inside wizard
-// ----------------------------------------------------
 function WizardOptionButton({ label, onClick }: { label: string; onClick: () => void }) {
   return (
     <button
@@ -928,14 +982,4 @@ function WizardOptionButton({ label, onClick }: { label: string; onClick: () => 
       {label}
     </button>
   );
-}
-
-// Deployment node selector triggers confetti
-function handlePlanSelect(name: string) {
-  confetti({
-    particleCount: 80,
-    spread: 60,
-    origin: { y: 0.7 },
-    colors: ['#6366f1', '#10b981'],
-  });
 }

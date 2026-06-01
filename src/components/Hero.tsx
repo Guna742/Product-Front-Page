@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, useScroll, useTransform, useMotionValue, useSpring } from 'framer-motion';
 import { ArrowRight, Play, Terminal, Cpu, Sparkles, Activity } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -16,6 +16,33 @@ export default function Hero() {
   const rotateX = useTransform(scrollY, [0, 600], [15, 0]);
   const opacity = useTransform(scrollY, [0, 500], [1, 0]);
   const yTranslate = useTransform(scrollY, [0, 600], [0, 50]);
+
+  // Spring-smoothed mouse coordinate trackers for 3D Perspective Hover Parallax
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  const springX = useSpring(mouseX, { stiffness: 120, damping: 22 });
+  const springY = useSpring(mouseY, { stiffness: 120, damping: 22 });
+
+  // Map coordinate range to tilt range (-10 to 10 degrees)
+  const hoverRotateX = useTransform(springY, [-0.5, 0.5], [10, -10]);
+  const hoverRotateY = useTransform(springX, [-0.5, 0.5], [-10, 10]);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    const xVal = e.clientX - rect.left;
+    const yVal = e.clientY - rect.top;
+
+    mouseX.set(xVal / width - 0.5);
+    mouseY.set(yVal / height - 0.5);
+  };
+
+  const handleMouseLeave = () => {
+    mouseX.set(0);
+    mouseY.set(0);
+  };
 
   const handleStartConfetti = () => {
     confetti({
@@ -163,111 +190,123 @@ export default function Hero() {
       </div>
 
       {/* Main 3D Perspective Workspace Mockup */}
-      <motion.div
-        initial={{ opacity: 0, y: 80 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.9, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
-        style={{ scale, rotateX }}
-        className="mt-16 sm:mt-24 w-full max-w-5xl rounded-3xl border border-neutral-200/60 dark:border-neutral-800/80 bg-white dark:bg-neutral-900 shadow-2xl p-3 sm:p-4 md:p-6"
-      >
-        <div className="relative aspect-[16/10] rounded-2xl overflow-hidden border border-neutral-100 dark:border-neutral-800/80 bg-neutral-950 flex flex-col text-neutral-300">
-          {/* Mock Window Bar */}
-          <div className="h-10 border-b border-neutral-800 bg-neutral-900 px-4 flex items-center justify-between">
-            <div className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-full bg-rose-500/80" />
-              <span className="w-3 h-3 rounded-full bg-amber-500/80" />
-              <span className="w-3 h-3 rounded-full bg-emerald-500/80" />
+      <div className="mt-16 sm:mt-24 w-full max-w-5xl [perspective:1000px] select-none">
+        <motion.div
+          initial={{ opacity: 0, y: 80 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.9, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          style={{ scale, rotateX }}
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
+          className="w-full rounded-3xl border border-neutral-200/60 dark:border-neutral-800/80 bg-white dark:bg-neutral-900 shadow-2xl p-3 sm:p-4 md:p-6 cursor-crosshair transition-shadow duration-300 hover:shadow-indigo-500/10"
+        >
+          <motion.div
+            style={{ rotateX: hoverRotateX, rotateY: hoverRotateY, transformStyle: 'preserve-3d' }}
+            className="w-full h-full"
+          >
+            <div className="relative aspect-[16/10] rounded-2xl overflow-hidden border border-neutral-100 dark:border-neutral-800/80 bg-neutral-950 flex flex-col text-neutral-300">
+              {/* Mock Window Bar */}
+              <div className="h-10 border-b border-neutral-800 bg-neutral-900 px-4 flex items-center justify-between">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-3 h-3 rounded-full bg-rose-500/80" />
+                  <span className="w-3 h-3 rounded-full bg-amber-500/80" />
+                  <span className="w-3 h-3 rounded-full bg-emerald-500/80" />
+                </div>
+                <div className="text-[11px] text-neutral-500 font-medium font-mono select-none">
+                  aether-cloud://canvas/global-workspace
+                </div>
+                <div className="w-14" />
+              </div>
+
+              {/* Canvas Interface Content */}
+              <div className="flex-1 bg-neutral-950 relative overflow-hidden flex">
+                {/* Sidebar */}
+                <div className="w-48 border-r border-neutral-900 bg-neutral-950/70 p-4 flex flex-col gap-5 select-none text-[12px] font-semibold text-neutral-400">
+                  <div className="space-y-2">
+                    <p className="text-[10px] uppercase text-neutral-600 font-extrabold tracking-wider">Workspaces</p>
+                    <div className="flex items-center gap-2 p-1.5 rounded-lg bg-neutral-900 text-white">
+                      <span className="w-2 h-2 rounded bg-indigo-500" />
+                      <span>Spacial Engine</span>
+                    </div>
+                    <div className="flex items-center gap-2 p-1.5 hover:text-neutral-200">
+                      <span className="w-2 h-2 rounded bg-neutral-700" />
+                      <span>Agent Config</span>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-[10px] uppercase text-neutral-600 font-extrabold tracking-wider">Models</p>
+                    <div className="flex items-center gap-2 p-1.5 text-neutral-400">
+                      <span>↳ Aether-15B</span>
+                    </div>
+                    <div className="flex items-center gap-2 p-1.5 text-indigo-400">
+                      <span>↳ Claude-3.5-Sonnet</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Simulated Node Canvas Grid */}
+                <div className="flex-1 bg-neutral-950/90 bg-[radial-gradient(#1f1f1f_1.2px,transparent_1.2px)] [background-size:24px_24px] relative p-6 flex flex-col justify-between">
+                  
+                  {/* Canvas node 1 */}
+                  <div className="absolute top-[18%] left-[8%] w-[210px] bg-neutral-900 border border-neutral-800 rounded-xl p-4 shadow-xl">
+                    <div className="flex items-center gap-2 text-indigo-400 mb-1.5">
+                      <Cpu size={14} />
+                      <span className="text-[11px] font-bold uppercase tracking-wider">LLM Prompt Engine</span>
+                    </div>
+                    <h4 className="text-[13px] font-bold text-white mb-1">Synthesizer Node</h4>
+                    <p className="text-[10px] text-neutral-400 leading-normal">Processes workspace items, mapping logic vectors automatically.</p>
+                  </div>
+
+                  {/* Connector line graphic */}
+                  <svg className="absolute inset-0 w-full h-full pointer-events-none">
+                    <defs>
+                      <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#6366f1" stopOpacity="0.9" />
+                        <stop offset="100%" stopColor="#d946ef" stopOpacity="0.9" />
+                      </linearGradient>
+                    </defs>
+                    {/* Visual curves connection nodes - animated flowing streams */}
+                    <path d="M 280 150 Q 380 180, 480 230" fill="none" stroke="url(#grad1)" strokeWidth="1.8" className="opacity-40" />
+                    <path d="M 280 150 Q 380 180, 480 230" fill="none" stroke="url(#grad1)" strokeWidth="1.8" className="animate-dash" />
+
+                    <path d="M 480 230 Q 560 300, 680 260" fill="none" stroke="#6366f1" strokeWidth="1.8" className="opacity-40" />
+                    <path d="M 480 230 Q 560 300, 680 260" fill="none" stroke="#6366f1" strokeWidth="1.8" className="animate-dash" />
+                  </svg>
+
+                  {/* Canvas node 2 */}
+                  <div className="absolute top-[48%] left-[45%] w-[190px] bg-neutral-900 border border-neutral-800 rounded-xl p-4 shadow-xl">
+                    <div className="flex items-center gap-2 text-fuchsia-400 mb-1.5">
+                      <Sparkles size={14} />
+                      <span className="text-[11px] font-bold uppercase tracking-wider">Transformation</span>
+                    </div>
+                    <h4 className="text-[13px] font-bold text-white mb-1">Vector DB Router</h4>
+                    <p className="text-[10px] text-neutral-400 leading-normal">Matches canvas entities dynamically into structured logs.</p>
+                  </div>
+
+                  {/* Canvas node 3 */}
+                  <div className="absolute top-[28%] right-[10%] w-[200px] bg-neutral-900 border border-neutral-800 rounded-xl p-4 shadow-xl">
+                    <div className="flex items-center gap-2 text-emerald-400 mb-1.5">
+                      <Activity size={14} />
+                      <span className="text-[11px] font-bold uppercase tracking-wider">Live Deploy</span>
+                    </div>
+                    <h4 className="text-[13px] font-bold text-white mb-1">Stripe Billing Pipeline</h4>
+                    <p className="text-[10px] text-neutral-400 leading-normal">Trigger charges on event hooks with 99.999% guarantee.</p>
+                  </div>
+
+                  {/* Micro bar bottom */}
+                  <div className="mt-auto w-full flex items-center justify-between border-t border-neutral-900 pt-3 text-[11px] text-neutral-500 select-none">
+                    <div>FPS: 120 / Spatial scale: 100%</div>
+                    <div className="flex items-center gap-3">
+                      <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-indigo-500" /> Connected</span>
+                      <span>v1.0.4-prod</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="text-[11px] text-neutral-500 font-medium font-mono select-none">
-              aether-cloud://canvas/global-workspace
-            </div>
-            <div className="w-14" />
-          </div>
-
-          {/* Canvas Interface Content */}
-          <div className="flex-1 bg-neutral-950 relative overflow-hidden flex">
-            {/* Sidebar */}
-            <div className="w-48 border-r border-neutral-900 bg-neutral-950/70 p-4 flex flex-col gap-5 select-none text-[12px] font-semibold text-neutral-400">
-              <div className="space-y-2">
-                <p className="text-[10px] uppercase text-neutral-600 font-extrabold tracking-wider">Workspaces</p>
-                <div className="flex items-center gap-2 p-1.5 rounded-lg bg-neutral-900 text-white">
-                  <span className="w-2 h-2 rounded bg-indigo-500" />
-                  <span>Spacial Engine</span>
-                </div>
-                <div className="flex items-center gap-2 p-1.5 hover:text-neutral-200">
-                  <span className="w-2 h-2 rounded bg-neutral-700" />
-                  <span>Agent Config</span>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <p className="text-[10px] uppercase text-neutral-600 font-extrabold tracking-wider">Models</p>
-                <div className="flex items-center gap-2 p-1.5 text-neutral-400">
-                  <span>↳ Aether-15B</span>
-                </div>
-                <div className="flex items-center gap-2 p-1.5 text-indigo-400">
-                  <span>↳ Claude-3.5-Sonnet</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Simulated Node Canvas Grid */}
-            <div className="flex-1 bg-neutral-950/90 bg-[radial-gradient(#1f1f1f_1.2px,transparent_1.2px)] [background-size:24px_24px] relative p-6 flex flex-col justify-between">
-              
-              {/* Canvas node 1 */}
-              <div className="absolute top-[18%] left-[8%] w-[210px] bg-neutral-900 border border-neutral-800 rounded-xl p-4 shadow-xl">
-                <div className="flex items-center gap-2 text-indigo-400 mb-1.5">
-                  <Cpu size={14} />
-                  <span className="text-[11px] font-bold uppercase tracking-wider">LLM Prompt Engine</span>
-                </div>
-                <h4 className="text-[13px] font-bold text-white mb-1">Synthesizer Node</h4>
-                <p className="text-[10px] text-neutral-400 leading-normal">Processes workspace items, mapping logic vectors automatically.</p>
-              </div>
-
-              {/* Connector line graphic */}
-              <svg className="absolute inset-0 w-full h-full pointer-events-none">
-                <defs>
-                  <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#6366f1" stopOpacity="0.8" />
-                    <stop offset="100%" stopColor="#d946ef" stopOpacity="0.8" />
-                  </linearGradient>
-                </defs>
-                {/* Visual curves connection nodes */}
-                <path d="M 280 150 Q 380 180, 480 230" fill="none" stroke="url(#grad1)" strokeWidth="1.5" strokeDasharray="4 2" />
-                <path d="M 480 230 Q 560 300, 680 260" fill="none" stroke="#6366f1" strokeWidth="1.5" />
-              </svg>
-
-              {/* Canvas node 2 */}
-              <div className="absolute top-[48%] left-[45%] w-[190px] bg-neutral-900 border border-neutral-800 rounded-xl p-4 shadow-xl">
-                <div className="flex items-center gap-2 text-fuchsia-400 mb-1.5">
-                  <Sparkles size={14} />
-                  <span className="text-[11px] font-bold uppercase tracking-wider">Transformation</span>
-                </div>
-                <h4 className="text-[13px] font-bold text-white mb-1">Vector DB Router</h4>
-                <p className="text-[10px] text-neutral-400 leading-normal">Matches canvas entities dynamically into structured logs.</p>
-              </div>
-
-              {/* Canvas node 3 */}
-              <div className="absolute top-[28%] right-[10%] w-[200px] bg-neutral-900 border border-neutral-800 rounded-xl p-4 shadow-xl">
-                <div className="flex items-center gap-2 text-emerald-400 mb-1.5">
-                  <Activity size={14} />
-                  <span className="text-[11px] font-bold uppercase tracking-wider">Live Deploy</span>
-                </div>
-                <h4 className="text-[13px] font-bold text-white mb-1">Stripe Billing Pipeline</h4>
-                <p className="text-[10px] text-neutral-400 leading-normal">Trigger charges on event hooks with 99.999% guarantee.</p>
-              </div>
-
-              {/* Micro bar bottom */}
-              <div className="mt-auto w-full flex items-center justify-between border-t border-neutral-900 pt-3 text-[11px] text-neutral-500 select-none">
-                <div>FPS: 120 / Spatial scale: 100%</div>
-                <div className="flex items-center gap-3">
-                  <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-indigo-500" /> Connected</span>
-                  <span>v1.0.4-prod</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </motion.div>
+          </motion.div>
+        </motion.div>
+      </div>
 
       {/* Bounce-Down Scroll Indicator */}
       <motion.div

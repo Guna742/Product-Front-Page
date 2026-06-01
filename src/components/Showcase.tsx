@@ -149,8 +149,12 @@ function CanvasTab() {
 
       {/* SVG Vector Paths Connector */}
       <svg className="absolute inset-0 w-full h-full pointer-events-none select-none">
-        <path d="M 120 100 Q 250 140, 360 145" fill="none" stroke="#818cf8" strokeWidth="1.5" />
-        <path d="M 120 220 Q 250 180, 360 145" fill="none" stroke="#818cf8" strokeWidth="1.5" />
+        {/* Base Static paths */}
+        <path d="M 120 100 Q 250 140, 360 145" fill="none" stroke="#818cf8" strokeWidth="1.5" className="opacity-30" />
+        <path d="M 120 100 Q 250 140, 360 145" fill="none" stroke="#818cf8" strokeWidth="1.8" className="animate-dash" />
+
+        <path d="M 120 220 Q 250 180, 360 145" fill="none" stroke="#818cf8" strokeWidth="1.5" className="opacity-30" />
+        <path d="M 120 220 Q 250 180, 360 145" fill="none" stroke="#818cf8" strokeWidth="1.8" className="animate-dash" />
         
         {/* Dynamic colored lines to destinations */}
         <path
@@ -158,17 +162,34 @@ function CanvasTab() {
           fill="none"
           stroke={nodes[3].status === 'connected' ? '#10b981' : '#a3a3a3'}
           strokeWidth="1.5"
-          strokeDasharray={nodes[3].status === 'connected' ? '0' : '4 3'}
-          className="transition-all duration-300"
+          className="opacity-30 transition-all duration-300"
         />
+        {nodes[3].status === 'connected' && (
+          <path
+            d="M 360 145 Q 480 100, 600 100"
+            fill="none"
+            stroke="#10b981"
+            strokeWidth="1.8"
+            className="animate-dash"
+          />
+        )}
+
         <path
           d="M 360 145 Q 480 200, 600 220"
           fill="none"
           stroke={nodes[4].status === 'connected' ? '#10b981' : '#a3a3a3'}
           strokeWidth="1.5"
-          strokeDasharray={nodes[4].status === 'connected' ? '0' : '4 3'}
-          className="transition-all duration-300"
+          className="opacity-30 transition-all duration-300"
         />
+        {nodes[4].status === 'connected' && (
+          <path
+            d="M 360 145 Q 480 200, 600 220"
+            fill="none"
+            stroke="#10b981"
+            strokeWidth="1.8"
+            className="animate-dash"
+          />
+        )}
       </svg>
 
       {/* Interactive Nodes list */}
