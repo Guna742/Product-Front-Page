@@ -748,10 +748,10 @@ export default function AllProducts() {
                               animate={{ opacity: 1, scale: 1 }}
                               exit={{ opacity: 0, scale: 0.96 }}
                               transition={{ duration: 0.25 }}
-                              className={`group relative overflow-hidden rounded-3xl border bg-white dark:bg-neutral-900 p-6 flex flex-col justify-between hover:scale-102 transition-all duration-300 select-none spotlight-card ${
+                              className={`group relative overflow-hidden rounded-3xl border bg-white dark:bg-neutral-900 p-6 flex flex-col justify-between hover:scale-102 hover:border-neutral-300 dark:hover:border-neutral-700 transition-all duration-300 select-none spotlight-card ${
                                 highlightedApps.includes(app.id)
                                   ? 'border-indigo-500 ring-2 ring-indigo-500/20 shadow-lg shadow-indigo-500/10'
-                                  : `border-neutral-200/60 dark:border-neutral-800 ${accentClasses[app.accent]?.border} ${accentClasses[app.accent]?.shadow}`
+                                  : 'border-neutral-200/60 dark:border-neutral-800'
                               }`}
                               onMouseMove={handleCardMouseMove}
                             >
@@ -764,11 +764,9 @@ export default function AllProducts() {
                                   </div>
                                   
                                   {app.popular && (
-                                    <div className="rgb-badge-wrapper shrink-0">
-                                      <span className="rgb-badge-content">
-                                        Popular
-                                      </span>
-                                    </div>
+                                    <span className="rgb-badge shrink-0">
+                                      Popular
+                                    </span>
                                   )}
                                 </div>
 
@@ -806,10 +804,10 @@ export default function AllProducts() {
                               initial={{ opacity: 0, y: 10 }}
                               animate={{ opacity: 1, y: 0 }}
                               exit={{ opacity: 0, y: 10 }}
-                              className={`group w-full px-5 py-4 rounded-2.5xl border bg-white dark:bg-neutral-900 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-all select-none hover:shadow-sm spotlight-card ${
+                              className={`group w-full px-5 py-4 rounded-2.5xl border bg-white dark:bg-neutral-900 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:border-neutral-300 dark:hover:border-neutral-700 transition-all select-none hover:shadow-sm spotlight-card ${
                                 highlightedApps.includes(app.id)
                                   ? 'border-indigo-500 ring-1 ring-indigo-500/20'
-                                  : `border-neutral-200/50 dark:border-neutral-800 ${accentClasses[app.accent]?.border}`
+                                  : 'border-neutral-200/50 dark:border-neutral-800'
                               }`}
                               onMouseMove={handleCardMouseMove}
                             >
@@ -821,11 +819,9 @@ export default function AllProducts() {
                                   <h4 className="text-[14px] sm:text-[15.5px] font-bold tracking-tight text-neutral-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 flex items-center gap-2 transition-colors duration-200">
                                     <span>{app.name}</span>
                                     {app.popular && (
-                                      <div className="rgb-badge-wrapper shrink-0">
-                                        <span className="rgb-badge-content text-[8px] px-1.5 py-0.5">
-                                          Popular
-                                        </span>
-                                      </div>
+                                      <span className="rgb-badge shrink-0 text-[8px] px-1.5 py-0.5">
+                                        Popular
+                                      </span>
                                     )}
                                   </h4>
                                   <span className="text-xs sm:text-[13px] text-neutral-500 dark:text-neutral-400 font-medium mt-0.5 block leading-tight">
